@@ -3,6 +3,8 @@ use std::fs;
 use std::io::{self};
 use std::num::ParseIntError;
 use std::path::{Path, PathBuf};
+use std::str::Utf8Error;
+use std::string::FromUtf8Error;
 use thiserror::Error;
 
 pub struct GitRepository {
@@ -13,6 +15,10 @@ pub struct GitRepository {
 
 #[derive(Error, Debug)]
 pub enum WyagError {
+    #[error("Malformed object {0}")]
+    MalformedObject(String),
+    #[error("Unknown object type : {0} for object : {1}")]
+    UnknownObjectType(String, String),
     #[error("Not a git repository : {0}")]
     NotARepository(PathBuf),
     #[error("Element not found : {0}")]
@@ -33,6 +39,12 @@ pub enum WyagError {
     Ini(#[from] ini::Error),
     #[error("Invalid integer parse : {0}")]
     ParseInt(#[from] ParseIntError),
+    #[error("UTF8 error : {0}")]
+    Utf8Error(#[from] Utf8Error),
+    #[error("From UTF8 error : {0}")]
+    FromUtf8Error(#[from] FromUtf8Error),
+    #[error("CTH - TODO")]
+    TODOERROR(),
 }
 
 impl GitRepository {
@@ -159,13 +171,13 @@ impl GitRepository {
         }
 
         if let Some(parent) = full_path.parent() {
-            return Ok(Self::repo_find(&parent, required)?);
+            Ok(Self::repo_find(parent, required)?)
         } else {
             // If we attained the system's root dir
             if required {
-                return Err(WyagError::NotARepository(full_path));
+                Err(WyagError::NotARepository(full_path))
             } else {
-                return Ok(None);
+                Ok(None)
             }
         }
     }
