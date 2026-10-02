@@ -3,6 +3,7 @@ use std::fs;
 use std::io::{self};
 use std::num::ParseIntError;
 use std::path::{Path, PathBuf};
+use std::str::Utf8Error;
 use thiserror::Error;
 
 pub struct GitRepository {
@@ -13,6 +14,10 @@ pub struct GitRepository {
 
 #[derive(Error, Debug)]
 pub enum WyagError {
+    #[error("Malformed object {0}")]
+    MalformedObject(String),
+    #[error("Unknown object type : {0} for object : {1}")]
+    UnknownObjectType(String, String),
     #[error("Not a git repository : {0}")]
     NotARepository(PathBuf),
     #[error("Element not found : {0}")]
@@ -33,6 +38,10 @@ pub enum WyagError {
     Ini(#[from] ini::Error),
     #[error("Invalid integer parse : {0}")]
     ParseInt(#[from] ParseIntError),
+    #[error("UTF8 error : {0}")]
+    Utf8Error(#[from] Utf8Error),
+    #[error("CTH - TODO")]
+    TODOERROR(),
 }
 
 impl GitRepository {

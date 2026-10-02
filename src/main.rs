@@ -1,6 +1,4 @@
 use clap::{Parser, Subcommand};
-use ini::Ini;
-use std::fs;
 use std::io::{self};
 use std::path::PathBuf;
 use wyag::repo::GitRepository;

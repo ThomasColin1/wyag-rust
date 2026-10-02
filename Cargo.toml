@@ -8,3 +8,5 @@ rust-ini = "0.21.3"
 tempfile = "3.26.0"
 clap = { version = "4", features = ["derive"] }
 thiserror = "2.0.21"
+flate2 = "1.1.10"
+io = "0.0.2"
