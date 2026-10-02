@@ -150,4 +150,23 @@ impl GitRepository {
 
         Ok(repo)
     }
+
+    pub fn repo_find(path: &Path, required: bool) -> Result<Option<GitRepository>, WyagError> {
+        let full_path = path.to_path_buf();
+
+        if full_path.join(".git").is_dir() {
+            return Ok(Some(Self::init(path, false)?));
+        }
+
+        if let Some(parent) = full_path.parent() {
+            return Ok(Self::repo_find(&parent, required)?);
+        } else {
+            // If we attained the system's root dir
+            if required {
+                return Err(WyagError::NotARepository(full_path));
+            } else {
+                return Ok(None);
+            }
+        }
+    }
 }
