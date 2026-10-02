@@ -1,10 +1,10 @@
 use clap::{Parser, Subcommand};
-use std::io::{self};
-use std::path::{Path, PathBuf};
 use ini::Ini;
 use std::fs;
-use thiserror::Error;
+use std::io::{self};
 use std::num::ParseIntError;
+use std::path::{Path, PathBuf};
+use thiserror::Error;
 
 #[derive(Parser)]
 #[command(about = "Write Yourself a Git (in rust)")]
@@ -53,7 +53,7 @@ pub enum WyagError {
 
 impl GitRepository {
     // Initializes the object (force=true for new repo)
-    pub fn init(path: &Path, force: bool) -> Result<Self, WyagError>{
+    pub fn init(path: &Path, force: bool) -> Result<Self, WyagError> {
         let worktree = path.to_path_buf();
         let gitdir = Path::new(path).join(".git");
         let mut conf = Ini::new();
@@ -87,8 +87,7 @@ impl GitRepository {
     }
 
     // Gives the path of a directory (creates it if mkdir=true)
-    pub fn repo_dir<P: AsRef<Path>>(&self, path: P, mkdir: bool) 
-        -> Result<PathBuf, WyagError> {
+    pub fn repo_dir<P: AsRef<Path>>(&self, path: P, mkdir: bool) -> Result<PathBuf, WyagError> {
         let full_path = self.gitdir.join(path);
 
         if full_path.exists() {
@@ -106,9 +105,7 @@ impl GitRepository {
     }
 
     // Gives the path of a file (creates the parent path if mkdir=true)
-    pub fn repo_file<P: AsRef<Path>>(&self, path: P, mkdir: bool) 
-        -> Result<PathBuf, WyagError> {
-        
+    pub fn repo_file<P: AsRef<Path>>(&self, path: P, mkdir: bool) -> Result<PathBuf, WyagError> {
         if let Some(parent) = path.as_ref().parent() {
             self.repo_dir(parent, mkdir)?;
         }
@@ -126,7 +123,7 @@ impl GitRepository {
 
         conf
     }
-    
+
     // Creates the repo (= git init)
     pub fn repo_create(path: &Path) -> Result<GitRepository, WyagError> {
         let repo = GitRepository::init(path, true)?;
@@ -144,33 +141,32 @@ impl GitRepository {
                     return Err(WyagError::DirectoryNotEmpty(repo.gitdir));
                 }
             }
-        
         } else {
             fs::create_dir_all(&repo.worktree)?;
         }
-        
+
         repo.repo_dir("branches", true)?;
         repo.repo_dir("objects", true)?;
         repo.repo_dir("refs/tags", true)?;
         repo.repo_dir("refs/heads", true)?;
-        
+
         let desc_path = repo.repo_file("description", true)?;
         let head_path = repo.repo_file("HEAD", true)?;
         let config_path = repo.repo_file("config", true)?;
 
-        fs::write(&desc_path, "Unnamed repository; edit this file \
-            'description' to name the repository.\n")?;
+        fs::write(
+            &desc_path,
+            "Unnamed repository; edit this file \
+            'description' to name the repository.\n",
+        )?;
 
         fs::write(&head_path, "ref: refs/heads/master\n")?;
 
         Self::repo_default_config().write_to_file(&config_path)?;
-        
+
         Ok(repo)
-        
     }
-
 }
-
 
 fn main() -> io::Result<()> {
     let cli = Cli::parse();
