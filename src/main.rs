@@ -23,7 +23,7 @@ enum Commands {
     CatFile {
         #[arg(long, default_value = "blob")]
         object_type: String,
-        #[arg(short, long)]
+        #[arg()]
         object: String,
     },
     HashObject {
