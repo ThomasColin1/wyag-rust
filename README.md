@@ -6,7 +6,10 @@ Based on the python-based guide https://wyag.thb.lt/.
 
 ## Work in progress
 
-Only `git init` is implemented as of now. 
+Implemented git commands : 
+- `init`
+- `cat-file`
+- `hash-object`
 
 ## How to use
 
